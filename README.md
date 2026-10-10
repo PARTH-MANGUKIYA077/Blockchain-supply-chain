@@ -37,6 +37,7 @@ This platform tracks products across their entire lifecycle—from raw material 
 - [Pre-Configured Demo Accounts & Roles](#-pre-configured-demo-accounts--roles)
 - [Backend REST API Reference](#-backend-rest-api-reference)
 - [Environment Variables](#-environment-variables)
+- [Author & Contact](#-author--contact)
 - [Contributing & License](#-contributing--license)
 
 ---
@@ -268,7 +269,12 @@ Ensure you have the following installed:
 ### 2. Clone Repository
 
 ```bash
+# Clone via SSH (Recommended)
+git clone git@github.com:PARTH-MANGUKIYA077/Blockchain-supply-chain.git
+
+# Or clone via HTTPS
 git clone https://github.com/PARTH-MANGUKIYA077/Blockchain-supply-chain.git
+
 cd Blockchain-supply-chain
 ```
 
@@ -492,6 +498,13 @@ Contributions are welcome! Please follow these steps:
 3. Commit your changes (`git commit -m 'Add AmazingFeature'`).
 4. Push to the branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request.
+
+## 📬 Author & Contact
+
+- **Author**: Parth Mangukiya
+- **Email**: [parthmangukiya063@gmail.com](mailto:parthmangukiya063@gmail.com)
+- **GitHub**: [@PARTH-MANGUKIYA077](https://github.com/PARTH-MANGUKIYA077)
+- **Repository**: [Blockchain-supply-chain](https://github.com/PARTH-MANGUKIYA077/Blockchain-supply-chain)
 
 ---
 

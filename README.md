@@ -7,9 +7,9 @@
 [![Node.js](https://img.shields.io/badge/Node.js-Express_4.19-339933.svg?logo=node.js)](https://nodejs.org/)
 [![Ethers.js](https://img.shields.io/badge/Ethers.js-v6.11-2535a0.svg)](https://docs.ethers.org/v6/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/Render-Live%20Demo-46E3B7.svg?logo=render&logoColor=white)](https://blockchain-supply-chain.onrender.com)
+[![Live Demo](https://img.shields.io/badge/Render-Live%20Demo-46E3B7.svg?logo=render&logoColor=white)](https://blockchain-supply-chain-p8e3.onrender.com)
 
-> 🚀 **Live Demo on Render**: [https://blockchain-supply-chain.onrender.com](https://blockchain-supply-chain.onrender.com)  
+> 🚀 **Live Demo on Render**: [https://blockchain-supply-chain-p8e3.onrender.com](https://blockchain-supply-chain-p8e3.onrender.com)  
 > Explore the live application directly in your browser without local setup!
 
 A enterprise-grade, decentralized **Blockchain Supply Chain Management DApp** built with **Solidity**, **Hardhat**, **Node.js/Express**, **React (Vite)**, **Ethers.js v6**, and an **Integrated QR Code Generation & Camera Scanner System**.
@@ -20,7 +20,7 @@ This platform tracks products across their entire lifecycle—from raw material 
 
 ## 🌐 Live Demo & Cloud Deployment
 
-- 🔗 **Production URL**: [https://blockchain-supply-chain.onrender.com](https://blockchain-supply-chain.onrender.com)
+- 🔗 **Production URL**: [https://blockchain-supply-chain-p8e3.onrender.com](https://blockchain-supply-chain-p8e3.onrender.com)
 - ⚙️ **Infrastructure**: Hosted on [Render](https://render.com) using Node.js Web Service specification (`render.yaml`).
 - ⚡ **Interactive Cloud Ledger**: Supports both live Web3 MetaMask wallets and an automatic in-browser simulated blockchain ledger fallback for instant cloud previews.
 
@@ -266,6 +266,8 @@ Blockchain-supply-chain/
 ---
 
 ## 🚀 Quick Start Guide & Full Setup
+
+> 🌐 **Live Cloud Deployment**: You can also run and test the live application directly online without installing anything locally at **[https://blockchain-supply-chain-p8e3.onrender.com](https://blockchain-supply-chain-p8e3.onrender.com)**.
 
 Follow these exact steps to set up and run the entire decentralized application on your local machine.
 

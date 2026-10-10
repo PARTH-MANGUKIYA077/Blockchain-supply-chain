@@ -2,15 +2,18 @@
   "name": "blockchain-supply-chain",
   "version": "1.0.0",
   "description": "Full-Stack Blockchain Supply Chain Management System with Node.js/Express backend & React frontend",
-  "main": "hardhat.config.js",
+  "main": "backend/server.js",
   "scripts": {
+    "start": "node backend/server.js",
+    "start:dev": "concurrently \"npm run chain\" \"npm run backend\" \"npm run frontend\"",
     "chain": "hardhat node",
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.js --network localhost",
     "backend": "cd backend && npm start",
     "frontend": "cd frontend && npm run dev",
-    "start": "concurrently \"npm run chain\" \"npm run backend\" \"npm run frontend\""
+    "build": "cd backend && npm install && cd ../frontend && npm install && npm run build",
+    "render-build": "cd backend && npm install && cd ../frontend && npm install && npm run build"
   },
   "keywords": [
     "blockchain",
@@ -23,13 +26,11 @@
   ],
   "author": "",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "concurrently": "^8.2.2",
-    "hardhat": "^2.22.0"
-  },
-  "dependencies": {
     "dotenv": "^16.4.5",
-    "ethers": "^6.11.1"
+    "ethers": "^6.11.1",
+    "hardhat": "^2.22.0"
   }
 }

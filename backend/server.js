@@ -58,6 +58,18 @@ const startServer = async () => {
     console.warn("MongoDB unavailable. Continuing with local blockchain-only mode.", error.message);
   }
 
+  // Serve frontend build if dist exists (e.g. Render/production deployment)
+  const frontendDist = path.join(__dirname, "../frontend/dist");
+  if (fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api")) {
+        return next();
+      }
+      res.sendFile(path.join(frontendDist, "index.html"));
+    });
+  }
+
   app.listen(PORT, async () => {
     console.log(`Backend Server listening on http://localhost:${PORT}`);
     await blockchainService.init();

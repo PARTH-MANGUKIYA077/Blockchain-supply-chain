@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { ethers } from "ethers";
 import contractDetails from "../config/contractDetails.json";
 import { normalizeRole, loadSession, saveSession, clearSession } from "../auth/session.js";
+import { createSimulatedContract, DEFAULT_ACCOUNTS } from "./simulatedLedger.js";
 
 const Web3Context = createContext(null);
 
@@ -13,12 +14,13 @@ export const Web3Provider = ({ children }) => {
   const [contract, setContract] = useState(null);
   const [currentAccount, setCurrentAccount] = useState("");
   const [currentRole, setCurrentRole] = useState("NONE");
-  const [sampleAccounts, setSampleAccounts] = useState({});
+  const [sampleAccounts, setSampleAccounts] = useState(DEFAULT_ACCOUNTS);
   const [allUsers, setAllUsers] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [useMetaMask, setUseMetaMask] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [authUser, setAuthUser] = useState(persistedSession.user);
   const [isAuthenticated, setIsAuthenticated] = useState(persistedSession.isAuthenticated);
   const [lastUpdated, setLastUpdated] = useState(new Date());
@@ -29,36 +31,68 @@ export const Web3Provider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      // JSON RPC Provider for Hardhat local node
-      const rpcProvider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
-      setProvider(rpcProvider);
+      const accountsList = (contractDetails && contractDetails.sampleAccounts) || DEFAULT_ACCOUNTS;
+      setSampleAccounts(accountsList);
 
-      if (!contractDetails || !contractDetails.address) {
-        throw new Error("Contract details not found. Please run 'npm run deploy' first.");
-      }
+      // Attempt to probe local Hardhat RPC node with a fast 1500ms timeout
+      let rpcProvider = null;
+      let isLiveRpcAvailable = false;
 
-      setSampleAccounts(contractDetails.sampleAccounts || {});
-
-      // Default to deployer (Admin) or first account from Hardhat node
-      const signers = await rpcProvider.listAccounts();
-      if (signers.length > 0) {
-        const defaultSigner = signers[0]; // Admin signer
-        setSigner(defaultSigner);
-        setCurrentAccount(defaultSigner.address);
-
-        const instance = new ethers.Contract(
-          contractDetails.address,
-          contractDetails.abi,
-          defaultSigner
+      try {
+        const candidateProvider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+        const probePromise = candidateProvider.getBlockNumber();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("RPC Timeout")), 1500)
         );
-        setContract(instance);
-
-        await fetchUserData(instance, defaultSigner.address);
-        await fetchProducts(instance);
+        await Promise.race([probePromise, timeoutPromise]);
+        rpcProvider = candidateProvider;
+        isLiveRpcAvailable = true;
+      } catch (probeErr) {
+        // Expected when running on Render or any public web deployment without local Hardhat node
+        isLiveRpcAvailable = false;
       }
+
+      if (isLiveRpcAvailable && rpcProvider && contractDetails?.address) {
+        setProvider(rpcProvider);
+        const signers = await rpcProvider.listAccounts();
+        if (signers.length > 0) {
+          const defaultSigner = signers[0];
+          setSigner(defaultSigner);
+          setCurrentAccount(defaultSigner.address);
+
+          const instance = new ethers.Contract(
+            contractDetails.address,
+            contractDetails.abi,
+            defaultSigner
+          );
+          setContract(instance);
+          await fetchUserData(instance, defaultSigner.address);
+          await fetchProducts(instance);
+          return;
+        }
+      }
+
+      // Seamless Cloud Fallback: Use simulated ledger contract
+      console.log("Local node offline or remote deployment detected. Starting Cloud Demo Mode.");
+      setIsDemoMode(true);
+      const defaultAccount = accountsList.manufacturer || DEFAULT_ACCOUNTS.manufacturer;
+      setCurrentAccount(defaultAccount);
+      setCurrentRole("MANUFACTURER");
+
+      const simulatedInstance = createSimulatedContract(() => currentAccount || defaultAccount);
+      setContract(simulatedInstance);
+      await fetchUserData(simulatedInstance, defaultAccount);
+      await fetchProducts(simulatedInstance);
     } catch (err) {
-      console.error("Failed to initialize Web3:", err);
-      setError(err.message);
+      console.warn("Falling back to simulated ledger due to:", err.message);
+      setIsDemoMode(true);
+      const fallbackAccount = DEFAULT_ACCOUNTS.manufacturer;
+      setCurrentAccount(fallbackAccount);
+      setCurrentRole("MANUFACTURER");
+      const simulatedInstance = createSimulatedContract(() => currentAccount || fallbackAccount);
+      setContract(simulatedInstance);
+      await fetchUserData(simulatedInstance, fallbackAccount);
+      await fetchProducts(simulatedInstance);
     } finally {
       setLoading(false);
     }
@@ -75,6 +109,10 @@ export const Web3Provider = ({ children }) => {
       const userSigner = await browserProvider.getSigner();
       const userAddress = await userSigner.getAddress();
 
+      if (!contractDetails || !contractDetails.address) {
+        throw new Error("Contract address configuration missing.");
+      }
+
       const instance = new ethers.Contract(
         contractDetails.address,
         contractDetails.abi,
@@ -86,6 +124,8 @@ export const Web3Provider = ({ children }) => {
       setContract(instance);
       setCurrentAccount(userAddress);
       setUseMetaMask(true);
+      setIsDemoMode(false);
+      setError(null);
 
       await fetchUserData(instance, userAddress);
       await fetchProducts(instance);
@@ -98,28 +138,35 @@ export const Web3Provider = ({ children }) => {
   const switchSimulatedAccount = async (targetRole) => {
     try {
       const normalizedRole = normalizeRole(targetRole);
-      const targetAddress = sampleAccounts[normalizedRole.toLowerCase()];
+      const accountsList = sampleAccounts || DEFAULT_ACCOUNTS;
+      const targetAddress = accountsList[normalizedRole.toLowerCase()] || DEFAULT_ACCOUNTS[normalizedRole.toLowerCase()];
       if (!targetAddress) {
         alert(`No account found for role ${targetRole}`);
         return;
       }
 
-      const rpcProvider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
-      const targetSigner = await rpcProvider.getSigner(targetAddress);
-
-      const instance = new ethers.Contract(
-        contractDetails.address,
-        contractDetails.abi,
-        targetSigner
-      );
-
-      setSigner(targetSigner);
-      setContract(instance);
       setCurrentAccount(targetAddress);
-      setUseMetaMask(false);
+      setCurrentRole(normalizedRole);
 
-      await fetchUserData(instance, targetAddress);
-      await fetchProducts(instance);
+      if (contract && contract.isSimulated) {
+        await fetchUserData(contract, targetAddress);
+        await fetchProducts(contract);
+      } else if (provider && !useMetaMask) {
+        try {
+          const targetSigner = await provider.getSigner(targetAddress);
+          const instance = new ethers.Contract(
+            contractDetails.address,
+            contractDetails.abi,
+            targetSigner
+          );
+          setSigner(targetSigner);
+          setContract(instance);
+          await fetchUserData(instance, targetAddress);
+          await fetchProducts(instance);
+        } catch (e) {
+          console.warn("Could not switch RPC signer:", e.message);
+        }
+      }
 
       if (isAuthenticated && authUser) {
         const nextSession = saveSession({
@@ -265,6 +312,7 @@ export const Web3Provider = ({ children }) => {
         loading,
         error,
         useMetaMask,
+        isDemoMode,
         lastUpdated,
         connectMetaMask,
         switchSimulatedAccount,

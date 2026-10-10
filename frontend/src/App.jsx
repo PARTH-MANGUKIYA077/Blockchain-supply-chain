@@ -111,7 +111,7 @@ const LoginScreen = () => {
 };
 
 const MainApp = () => {
-  const { products, loading, error, currentRole, refresh, isAuthenticated, login, switchSimulatedAccount, logout } = useWeb3();
+  const { products, loading, error, isDemoMode, currentRole, refresh, isAuthenticated, login, switchSimulatedAccount, logout } = useWeb3();
   const [activeTab, setActiveTab] = useState("products");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTimelineId, setSelectedTimelineId] = useState(null);
@@ -159,6 +159,15 @@ const MainApp = () => {
               <div style={{ fontSize: "0.85rem", marginTop: "0.25rem" }}>
                 Make sure the local Hardhat RPC node is running (<code>npm run chain</code>) and contract is deployed (<code>npm run deploy</code>).
               </div>
+            </div>
+          </div>
+        )}
+
+        {isDemoMode && !error && (
+          <div style={{ background: "rgba(37, 99, 235, 0.12)", border: "1px solid rgba(96, 165, 250, 0.3)", padding: "0.85rem 1.25rem", borderRadius: "10px", color: "#93c5fd", marginBottom: "1.5rem", display: "flex", gap: "0.75rem", alignItems: "center" }}>
+            <span style={{ fontSize: "1.2rem" }}>🌐</span>
+            <div>
+              <strong>Live Cloud Demo Ledger Active:</strong> Running in simulated on-chain sandbox mode. Role switching, stage updates, product registration, QR generation, and webcam scanning are fully functional. Connect MetaMask at any time to submit real on-chain transactions.
             </div>
           </div>
         )}

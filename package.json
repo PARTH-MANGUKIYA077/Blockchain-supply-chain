@@ -2,6 +2,7 @@
   "name": "blockchain-supply-chain",
   "version": "1.0.0",
   "description": "Full-Stack Blockchain Supply Chain Management System with Node.js/Express backend & React frontend",
+  "homepage": "https://blockchain-supply-chain.onrender.com",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",

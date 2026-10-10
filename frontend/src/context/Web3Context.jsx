@@ -276,6 +276,67 @@ export const Web3Provider = ({ children }) => {
     }
   };
 
+  const deleteProduct = async (productId) => {
+    try {
+      setLoading(true);
+      if (contract && contract.deleteProduct) {
+        const tx = await contract.deleteProduct(productId);
+        if (tx && tx.wait) await tx.wait();
+      }
+      try {
+        const raw = localStorage.getItem("blockchain_supply_chain_ledger_v1");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          parsed.products = (parsed.products || []).filter(
+            (p) => String(p.id) !== String(productId)
+          );
+          localStorage.setItem("blockchain_supply_chain_ledger_v1", JSON.stringify(parsed));
+        }
+      } catch (e) {}
+
+      try {
+        await fetch(`/api/products/${productId}`, { method: "DELETE" });
+      } catch (e) {}
+
+      if (contract) {
+        await fetchProducts(contract);
+      }
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearAllProducts = async () => {
+    try {
+      setLoading(true);
+      if (contract && contract.clearAllProducts) {
+        const tx = await contract.clearAllProducts();
+        if (tx && tx.wait) await tx.wait();
+      }
+      try {
+        const raw = localStorage.getItem("blockchain_supply_chain_ledger_v1");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          parsed.products = [];
+          localStorage.setItem("blockchain_supply_chain_ledger_v1", JSON.stringify(parsed));
+        } else {
+          localStorage.setItem("blockchain_supply_chain_ledger_v1", JSON.stringify({ users: [], products: [] }));
+        }
+      } catch (e) {}
+
+      if (contract) {
+        await fetchProducts(contract);
+      }
+    } catch (err) {
+      console.error("Error clearing products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const refresh = async () => {
     if (!contract || !currentAccount) return;
     await fetchUserData(contract, currentAccount);
@@ -320,7 +381,9 @@ export const Web3Provider = ({ children }) => {
         logout,
         fetchProducts,
         fetchUserData,
-        refresh
+        refresh,
+        deleteProduct,
+        clearAllProducts
       }}
     >
       {children}

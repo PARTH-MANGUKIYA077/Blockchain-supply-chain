@@ -9,7 +9,7 @@ import { ProductTimeline } from "./components/ProductTimeline";
 import { RoleManagement } from "./components/RoleManagement";
 import { QRCodeModal } from "./components/QRCodeModal";
 import { QRScannerModal } from "./components/QRScannerModal";
-import { Plus, Search, RefreshCw, Layers, Users, AlertCircle, QrCode, UserRound, LockKeyhole } from "lucide-react";
+import { Plus, Search, RefreshCw, Layers, Users, AlertCircle, QrCode, UserRound, LockKeyhole, Trash2 } from "lucide-react";
 
 const LoginScreen = () => {
   const { switchSimulatedAccount, login, currentRole } = useWeb3();
@@ -111,7 +111,7 @@ const LoginScreen = () => {
 };
 
 const MainApp = () => {
-  const { products, loading, error, isDemoMode, currentRole, refresh, isAuthenticated, login, switchSimulatedAccount, logout } = useWeb3();
+  const { products, loading, error, isDemoMode, currentRole, refresh, isAuthenticated, login, switchSimulatedAccount, logout, deleteProduct, clearAllProducts } = useWeb3();
   const [activeTab, setActiveTab] = useState("products");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTimelineId, setSelectedTimelineId] = useState(null);
@@ -222,6 +222,21 @@ const MainApp = () => {
                   <RefreshCw size={16} /> Sync State
                 </button>
 
+                {products.length > 0 && (
+                  <button
+                    className="btn btn-secondary"
+                    style={{ color: "#fda4af", borderColor: "rgba(244, 63, 94, 0.3)" }}
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to remove all products?")) {
+                        clearAllProducts();
+                      }
+                    }}
+                    title="Clear All Products"
+                  >
+                    <Trash2 size={16} /> Clear Products
+                  </button>
+                )}
+
                 {canCreate && (
                   <button className="btn btn-primary" onClick={() => setIsAddModalOpen(true)}>
                     <Plus size={16} /> Add New Product
@@ -248,6 +263,7 @@ const MainApp = () => {
                     onSelectTimeline={(id) => setSelectedTimelineId(id)}
                     onAction={handleOpenActionModal}
                     onShowQRCode={(prod) => setSelectedQRProduct(prod)}
+                    onDelete={deleteProduct}
                   />
                 ))}
               </div>

@@ -198,6 +198,19 @@ export function createSimulatedContract(getCurrentCaller) {
       return { wait: waitTx };
     },
 
+    deleteProduct: async (id) => {
+      const numId = String(id);
+      state.products = state.products.filter((x) => String(x.id) !== numId);
+      saveLedgerState(state);
+      return { wait: waitTx };
+    },
+
+    clearAllProducts: async () => {
+      state.products = [];
+      saveLedgerState(state);
+      return { wait: waitTx };
+    },
+
     shipToSupplier: async (id, supplier, location, notes) => {
       const caller = getCaller();
       const p = state.products.find((x) => String(x.id) === String(id));

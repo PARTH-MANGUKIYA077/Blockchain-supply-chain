@@ -1,8 +1,8 @@
 import React from "react";
 import { useWeb3 } from "../context/Web3Context";
-import { Package, MapPin, Tag, User, Clock, ChevronRight } from "lucide-react";
+import { Package, MapPin, Tag, User, Clock, ChevronRight, Trash2 } from "lucide-react";
 
-export const ProductCard = ({ product, onSelectTimeline, onAction, onShowQRCode }) => {
+export const ProductCard = ({ product, onSelectTimeline, onAction, onShowQRCode, onDelete }) => {
   const { currentAccount, currentRole } = useWeb3();
 
   const isOwner = product.owner.toLowerCase() === currentAccount.toLowerCase();
@@ -161,6 +161,25 @@ export const ProductCard = ({ product, onSelectTimeline, onAction, onShowQRCode 
           >
             QR Code
           </button>
+          {onDelete && (
+            <button
+              className="btn btn-secondary btn-sm"
+              style={{
+                padding: "0.35rem 0.6rem",
+                color: "#fda4af",
+                background: "rgba(244, 63, 94, 0.1)",
+                border: "1px solid rgba(244, 63, 94, 0.25)"
+              }}
+              onClick={() => {
+                if (window.confirm(`Are you sure you want to delete ${product.name} (#${product.sku})?`)) {
+                  onDelete(product.id);
+                }
+              }}
+              title="Delete Product"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
         </div>
       </div>
     </div>

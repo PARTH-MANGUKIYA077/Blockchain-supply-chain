@@ -223,4 +223,15 @@ router.get("/:id/qr", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    await Product.findOneAndDelete({ $or: [{ productId: req.params.id }, { _id: req.params.id }] });
+    await Transaction.deleteMany({ productId: req.params.id });
+    await SupplyChainEvent.deleteMany({ productId: req.params.id });
+    return res.json({ success: true, message: "Product deleted." });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router;

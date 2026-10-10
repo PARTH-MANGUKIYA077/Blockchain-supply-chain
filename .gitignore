@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Hardhat & Smart Contracts
+cache/
+artifacts/
+build-info/
+frontend/src/artifacts/build-info/
+typechain/
+typechain-types/
+
+# Production Builds
+dist/
+build/
+frontend/dist/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+backend/.env
+
+# Database
+data/
+db/
+*.sqlite
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & Temp files
+logs/
+*.log
+*.tmp

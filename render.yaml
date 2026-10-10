@@ -13,6 +13,6 @@ services:
       - key: RPC_URL
         value: http://127.0.0.1:8545
       - key: MONGODB_URI
-        value: mongodb://127.0.0.1:27017/blockchain-supply-chain
+        sync: false
       - key: JWT_SECRET
         generateValue: true

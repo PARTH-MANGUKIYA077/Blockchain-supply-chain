@@ -13,7 +13,8 @@
     "backend": "cd backend && npm start",
     "frontend": "cd frontend && npm run dev",
     "build": "cd backend && npm install && cd ../frontend && npm install && npm run build",
-    "render-build": "cd backend && npm install && cd ../frontend && npm install && npm run build"
+    "render-build": "cd backend && npm install && cd ../frontend && npm install && npm run build",
+    "postinstall": "cd backend && npm install && cd ../frontend && npm install && npm run build"
   },
   "keywords": [
     "blockchain",
